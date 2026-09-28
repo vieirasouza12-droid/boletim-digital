@@ -1,76 +1,176 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <!-- Garante que o site funcione bem em celular -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boletim Digital</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+/* ============================
+   VARIÁVEIS DE CORES (fica fácil mudar depois)
+   ============================ */
+:root {
+  --rosa-claro: #fdeef2;      /* cor principal: rosa bem clarinho */
+  --rosa-destaque: #f7c6d4;   /* rosa um pouco mais forte para detalhes */
+  --cinza-claro: #f2f2f2;     /* cor secundária: cinza claro */
+  --cinza-borda: #e0e0e0;
+  --texto: #333333;
+  --texto-suave: #777777;
+  --branco: #ffffff;
+}
 
-  <!-- CABEÇALHO -->
-  <header class="cabecalho">
-    <h1>Boletim Digital</h1>
-    <p class="subtitulo">8º Ano — Estudante Exemplo</p>
-  </header>
+/* ============================
+   RESET BÁSICO
+   ============================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <main class="conteudo">
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--cinza-claro);
+  color: var(--texto);
+  line-height: 1.5;
+  padding-bottom: 40px;
+}
 
-    <!-- ÁREA DOS CARDS DE RESUMO -->
-    <section class="cards-resumo">
-      <div class="card">
-        <h2>Média Geral</h2>
-        <p id="card-media-geral">—</p>
-      </div>
+/* ============================
+   CABEÇALHO
+   ============================ */
+.cabecalho {
+  background-color: var(--rosa-claro);
+  text-align: center;
+  padding: 30px 20px;
+  border-bottom: 3px solid var(--rosa-destaque);
+}
 
-      <div class="card">
-        <h2>Total de Faltas</h2>
-        <p id="card-total-faltas">—</p>
-      </div>
+.cabecalho h1 {
+  font-size: 2rem;
+  color: #7a4a5a; /* tom de rosa escuro para o título ficar legível */
+}
 
-      <div class="card">
-        <h2>Bom Desempenho</h2>
-        <p id="card-bom-desempenho">—</p>
-      </div>
+.subtitulo {
+  color: var(--texto-suave);
+  margin-top: 6px;
+  font-size: 1rem;
+}
 
-      <div class="card">
-        <h2>Precisam de Atenção</h2>
-        <p id="card-atencao">—</p>
-      </div>
+/* ============================
+   CONTEÚDO GERAL
+   ============================ */
+.conteudo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-      <div class="card">
-        <h2>Frequência</h2>
-        <p id="card-frequencia">—</p>
-        <span class="card-extra" id="card-frequencia-texto"></span>
-      </div>
-    </section>
+/* ============================
+   CARDS DE RESUMO
+   ============================ */
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
 
-    <!-- TABELA DE DISCIPLINAS -->
-    <section class="area-tabela">
-      <h2 class="titulo-tabela">Notas por Disciplina</h2>
+.card {
+  background-color: var(--branco);
+  border-radius: 10px;           /* cantos levemente arredondados */
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* sombra suave */
+  border-left: 4px solid var(--rosa-destaque);
+}
 
-      <div class="tabela-responsiva">
-        <table>
-          <thead>
-            <tr>
-              <th>Disciplina</th>
-              <th>1º Tri</th>
-              <th>2º Tri</th>
-              <th>3º Tri</th>
-              <th>Média</th>
-              <th>Faltas</th>
-              <th>Situação</th>
-            </tr>
-          </thead>
-          <!-- O JavaScript vai preencher o corpo da tabela aqui -->
-          <tbody id="corpo-tabela"></tbody>
-        </table>
-      </div>
-    </section>
+.card h2 {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  font-weight: normal;
+  margin-bottom: 8px;
+}
 
-  </main>
+.card p {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #7a4a5a;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+.card-extra {
+  display: block;
+  font-size: 0.8rem;
+  color: #4caf50; /* verde para indicar "adequada" */
+  margin-top: 4px;
+}
+
+/* ============================
+   ÁREA DA TABELA
+   ============================ */
+.area-tabela {
+  background-color: var(--branco);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.titulo-tabela {
+  margin-bottom: 16px;
+  color: #7a4a5a;
+  font-size: 1.2rem;
+}
+
+/* Deixa a tabela rolável no celular */
+.tabela-responsiva {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* força rolagem horizontal em telas pequenas */
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--cinza-borda);
+  font-size: 0.9rem;
+}
+
+th {
+  background-color: var(--rosa-claro);
+  color: #7a4a5a;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background-color: var(--cinza-claro);
+}
+
+/* Destaque visual para a situação */
+.situacao-bom {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.situacao-atencao {
+  color: #e67e22;
+  font-weight: bold;
+}
+
+.situacao-sem-nota {
+  color: var(--texto-suave);
+  font-style: italic;
+}
+
+/* ============================
+   AJUSTES PARA CELULAR
+   ============================ */
+@media (max-width: 600px) {
+  .cabecalho h1 {
+    font-size: 1.5rem;
+  }
+
+  .card p {
+    font-size: 1.3rem;
+  }
+
+  .conteudo {
+    padding: 12px;
+  }
+}
