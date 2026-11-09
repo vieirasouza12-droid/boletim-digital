@@ -9,6 +9,8 @@
   --texto: #333333;
   --texto-suave: #777777;
   --branco: #ffffff;
+  --erro: #d32f2f;
+  --sucesso: #388e3c;
 }
 
 /* ============================
@@ -159,6 +161,173 @@ tbody tr:hover {
 }
 
 /* ============================
+   NOVOS ESTILOS — ACESSO E EDIÇÃO
+   ============================ */
+.area-login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.card-login {
+  background-color: var(--branco);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border-top: 5px solid var(--rosa-destaque);
+}
+
+.card-login h2 {
+  font-size: 1.3rem;
+  color: #7a4a5a;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.info-estudante {
+  background-color: var(--rosa-claro);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.info-estudante p {
+  margin: 4px 0;
+  color: #7a4a5a;
+}
+
+.campo-login {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-login label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #7a4a5a;
+}
+
+.campo-login input,
+.tabela-responsiva input {
+  padding: 10px;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.campo-login input:focus,
+.tabela-responsiva input:focus {
+  outline: none;
+  border-color: #7a4a5a;
+}
+
+.btn-principal {
+  width: 100%;
+  background-color: #7a4a5a;
+  color: var(--branco);
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-principal:hover {
+  background-color: #5c3743;
+}
+
+.btn-secundario {
+  background-color: var(--rosa-claro);
+  color: #7a4a5a;
+  border: 1px solid var(--rosa-destaque);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secundario:hover {
+  background-color: var(--rosa-destaque);
+}
+
+.btn-cancelar {
+  background-color: #e0e0e0;
+  color: var(--texto);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancelar:hover {
+  background-color: #d0d0d0;
+}
+
+.barra-acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.area-edicao {
+  background-color: var(--branco);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  border-left: 4px solid #7a4a5a;
+}
+
+.area-edicao h2 {
+  color: #7a4a5a;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.instrucao-edicao {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  margin-bottom: 16px;
+}
+
+.acoes-edicao {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.acoes-edicao .btn-principal {
+  width: auto;
+}
+
+.mensagem-status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.mensagem-status.erro {
+  color: var(--erro);
+}
+
+.mensagem-status.sucesso {
+  color: var(--sucesso);
+}
+
+.campo-invalido {
+  border: 2px solid var(--erro) !important;
+  background-color: #ffebee;
+}
+
+/* ============================
    AJUSTES PARA CELULAR
    ============================ */
 @media (max-width: 600px) {
@@ -172,5 +341,14 @@ tbody tr:hover {
 
   .conteudo {
     padding: 12px;
+  }
+
+  .acoes-edicao {
+    flex-direction: column;
+  }
+
+  .acoes-edicao .btn-principal,
+  .btn-cancelar {
+    width: 100%;
   }
 }

@@ -12,10 +12,61 @@
   <!-- CABEÇALHO -->
   <header class="cabecalho">
     <h1>Boletim Digital</h1>
-    <p class="subtitulo">8º Ano — Estudante Exemplo</p>
+    <p class="subtitulo">8º Ano — Turma 8B — Nº 4</p>
   </header>
 
-  <main class="conteudo">
+  <!-- ÁREA DE LOGIN (PIN) -->
+  <section id="area-login" class="area-login">
+    <div class="card-login">
+      <h2>Acesso ao Boletim</h2>
+      <div class="info-estudante">
+        <p><strong>Série:</strong> 8º Ano</p>
+        <p><strong>Turma:</strong> 8B</p>
+        <p><strong>Chamada:</strong> 4</p>
+      </div>
+      <div class="campo-login">
+        <label for="input-pin">PIN:</label>
+        <input type="password" id="input-pin" placeholder="Digite seu PIN" autocomplete="off" />
+      </div>
+      <button id="btn-entrar" class="btn-principal">Entrar</button>
+      <div id="mensagem-login" class="mensagem-status"></div>
+    </div>
+  </section>
+
+  <!-- CONTEÚDO PRINCIPAL DO BOLETIM (OCULTO ATÉ O LOGIN) -->
+  <main id="area-boletim" class="conteudo" style="display: none;">
+
+    <!-- BARRA DE AÇÕES DO BOLETIM -->
+    <div class="barra-acoes">
+      <button id="btn-alterar-dados" class="btn-secundario">Alterar dados</button>
+    </div>
+
+    <!-- ÁREA DE EDIÇÃO DE NOTAS E FALTAS (OCULTA INICIALMENTE) -->
+    <section id="area-edicao" class="area-edicao" style="display: none;">
+      <h2>Editar Notas e Faltas</h2>
+      <p class="instrucao-edicao">Digite as notas (de 0 a 10 ou em branco) e as faltas (números inteiros maiores ou iguais a 0).</p>
+      <div class="tabela-responsiva">
+        <table>
+          <thead>
+            <tr>
+              <th>Disciplina</th>
+              <th>1º Tri Nota</th>
+              <th>1º Tri Faltas</th>
+              <th>2º Tri Nota</th>
+              <th>2º Tri Faltas</th>
+              <th>3º Tri Nota</th>
+              <th>3º Tri Faltas</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-tabela-edicao"></tbody>
+        </table>
+      </div>
+      <div class="acoes-edicao">
+        <button id="btn-salvar" class="btn-principal">Salvar alterações</button>
+        <button id="btn-cancelar" class="btn-cancelar">Cancelar</button>
+      </div>
+      <div id="mensagem-salvar" class="mensagem-status"></div>
+    </section>
 
     <!-- ÁREA DOS CARDS DE RESUMO -->
     <section class="cards-resumo">
