@@ -121,11 +121,60 @@ function formatarNota(valor) {
 }
 
 // =====================================================
+// FUNÇÃO: carregarDadosLocais()
+// Prepara os dados brutos padrão para a estrutura do sistema
+// =====================================================
+function carregarDadosLocais() {
+  return dadosBrutos.map(function (item) {
+    const f1 = item.faltas && item.faltas[0] !== undefined ? parseInt(item.faltas[0], 10) : 0;
+    const f2 = item.faltas && item.faltas[1] !== undefined ? parseInt(item.faltas[1], 10) : 0;
+    const f3 = item.faltas && item.faltas[2] !== undefined ? parseInt(item.faltas[2], 10) : 0;
+
+    return {
+      disciplina: item.disciplina,
+      tri1: normalizarNota(item.tri1),
+      tri2: normalizarNota(item.tri2),
+      tri3: normalizarNota(item.tri3),
+      faltas1: isNaN(f1) ? 0 : f1,
+      faltas2: isNaN(f2) ? 0 : f2,
+      faltas3: isNaN(f3) ? 0 : f3
+    };
+  });
+}
+
+// =====================================================
+// FUNÇÃO: processarDadosAPI(dados)
+// Adapta dados vindos da API
+// =====================================================
+function processarDadosAPI(dados) {
+  if (!dados || !Array.isArray(dados.disciplinas)) {
+    return carregarDadosLocais();
+  }
+
+  return dados.disciplinas.map(function (item) {
+    const f1 = item.faltas1 !== undefined ? parseInt(item.faltas1, 10) : (item.faltas && item.faltas[0] !== undefined ? parseInt(item.faltas[0], 10) : 0);
+    const f2 = item.faltas2 !== undefined ? parseInt(item.faltas2, 10) : (item.faltas && item.faltas[1] !== undefined ? parseInt(item.faltas[1], 10) : 0);
+    const f3 = item.faltas3 !== undefined ? parseInt(item.faltas3, 10) : (item.faltas && item.faltas[2] !== undefined ? parseInt(item.faltas[2], 10) : 0);
+
+    return {
+      disciplina: item.disciplina,
+      tri1: normalizarNota(item.tri1),
+      tri2: normalizarNota(item.tri2),
+      tri3: normalizarNota(item.tri3),
+      faltas1: isNaN(f1) ? 0 : f1,
+      faltas2: isNaN(f2) ? 0 : f2,
+      faltas3: isNaN(f3) ? 0 : f3
+    };
+  });
+}
+
+// =====================================================
 // FUNÇÃO: renderizarBoletim()
 // Reconstrói os cards e a tabela garantindo segurança no DOM
 // =====================================================
 function renderizarBoletim() {
   const corpoTabela = document.getElementById("corpo-tabela");
+  if (!corpoTabela) return;
   corpoTabela.innerHTML = "";
 
   let somaMedias = 0;
@@ -133,3 +182,355 @@ function renderizarBoletim() {
   let totalFaltas = 0;
   let bomDesempenho = 0;
   let atencao = 0;
+
+  boletimAtual.forEach(function (item) {
+    const n1 = item.tri1;
+    const n2 = item.tri2;
+    const n3 = item.tri3;
+
+    const arrFaltas = [item.faltas1 || 0, item.faltas2 || 0, item.faltas3 || 0];
+    const faltasDisc = somarFaltas(arrFaltas);
+    totalFaltas += faltasDisc;
+
+    const media = calcularMedia([n1, n2, n3]);
+    if (media !== null) {
+      somaMedias += media;
+      quantidadeMedias++;
+      if (media >= MEDIA_MINIMA) {
+        bomDesempenho++;
+      } else {
+        atencao++;
+      }
+    }
+
+    const situacao = definirSituacao(media);
+
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    tdNome.textContent = item.disciplina;
+    tr.appendChild(tdNome);
+
+    const tdTri1 = document.createElement("td");
+    tdTri1.textContent = formatarNota(n1);
+    tr.appendChild(tdTri1);
+
+    const tdTri2 = document.createElement("td");
+    tdTri2.textContent = formatarNota(n2);
+    tr.appendChild(tdTri2);
+
+    const tdTri3 = document.createElement("td");
+    tdTri3.textContent = formatarNota(n3);
+    tr.appendChild(tdTri3);
+
+    const tdMedia = document.createElement("td");
+    tdMedia.textContent = formatarNota(media);
+    tr.appendChild(tdMedia);
+
+    const tdFaltas = document.createElement("td");
+    tdFaltas.textContent = faltasDisc;
+    tr.appendChild(tdFaltas);
+
+    const tdSit = document.createElement("td");
+    tdSit.textContent = situacao.texto;
+    tdSit.className = situacao.classe;
+    tr.appendChild(tdSit);
+
+    corpoTabela.appendChild(tr);
+  });
+
+  // Atualiza Cards
+  const elMediaGeral = document.getElementById("card-media-geral");
+  if (elMediaGeral) {
+    if (quantidadeMedias > 0) {
+      elMediaGeral.textContent = formatarNota(somaMedias / quantidadeMedias);
+    } else {
+      elMediaGeral.textContent = "—";
+    }
+  }
+
+  const elTotalFaltas = document.getElementById("card-total-faltas");
+  if (elTotalFaltas) elTotalFaltas.textContent = totalFaltas;
+
+  const elBomDesempenho = document.getElementById("card-bom-desempenho");
+  if (elBomDesempenho) elBomDesempenho.textContent = bomDesempenho;
+
+  const elAtencao = document.getElementById("card-atencao");
+  if (elAtencao) elAtencao.textContent = atencao;
+
+  const elFreq = document.getElementById("card-frequencia");
+  if (elFreq) elFreq.textContent = "100%";
+
+  const elFreqTxt = document.getElementById("card-frequencia-texto");
+  if (elFreqTxt) elFreqTxt.textContent = "Frequência adequada";
+}
+
+// =====================================================
+// FUNÇÃO: renderizarTabelaEdicao()
+// Monta os campos de input para edição de notas e faltas
+// =====================================================
+function renderizarTabelaEdicao() {
+  const corpoEdicao = document.getElementById("corpo-tabela-edicao");
+  if (!corpoEdicao) return;
+  corpoEdicao.innerHTML = "";
+
+  boletimAtual.forEach(function (item, idx) {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    tdNome.textContent = item.disciplina;
+    tr.appendChild(tdNome);
+
+    function criarInputNota(valor, id) {
+      const td = document.createElement("td");
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = id;
+      inp.value = valor !== null ? String(valor).replace(".", ",") : "";
+      td.appendChild(inp);
+      return td;
+    }
+
+    function criarInputFalta(valor, id) {
+      const td = document.createElement("td");
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.id = id;
+      inp.value = valor !== null && valor !== undefined ? valor : 0;
+      td.appendChild(inp);
+      return td;
+    }
+
+    tr.appendChild(criarInputNota(item.tri1, `edit-n1-${idx}`));
+    tr.appendChild(criarInputFalta(item.faltas1, `edit-f1-${idx}`));
+    tr.appendChild(criarInputNota(item.tri2, `edit-n2-${idx}`));
+    tr.appendChild(criarInputFalta(item.faltas2, `edit-f2-${idx}`));
+    tr.appendChild(criarInputNota(item.tri3, `edit-n3-${idx}`));
+    tr.appendChild(criarInputFalta(item.faltas3, `edit-f3-${idx}`));
+
+    corpoEdicao.appendChild(tr);
+  });
+}
+
+// =====================================================
+// VALIDAÇÕES DA EDIÇÃO
+// =====================================================
+function validarNotaDigitada(str) {
+  if (str === null || str === undefined) return null;
+  const texto = str.trim();
+  if (texto === "") return null;
+
+  if (!/^\d+([.,]\d+)?$/.test(texto)) {
+    return false;
+  }
+
+  const num = parseFloat(texto.replace(",", "."));
+  if (isNaN(num) || num < 0 || num > 10) {
+    return false;
+  }
+
+  return num;
+}
+
+function validarFaltaDigitada(str) {
+  if (str === null || str === undefined) return false;
+  const texto = String(str).trim();
+  if (texto === "") return false;
+
+  if (!/^\d+$/.test(texto)) {
+    return false;
+  }
+
+  const num = parseInt(texto, 10);
+  if (isNaN(num) || num < 0) {
+    return false;
+  }
+
+  return num;
+}
+
+// =====================================================
+// AÇÕES E EVENTOS HTTP / API
+// =====================================================
+document.addEventListener("DOMContentLoaded", function () {
+  const btnEntrar = document.getElementById("btn-entrar");
+  const inputPin = document.getElementById("input-pin");
+  const msgLogin = document.getElementById("mensagem-login");
+  const areaLogin = document.getElementById("area-login");
+  const areaBoletim = document.getElementById("area-boletim");
+
+  const btnAlterarDados = document.getElementById("btn-alterar-dados");
+  const areaEdicao = document.getElementById("area-edicao");
+  const btnSalvar = document.getElementById("btn-salvar");
+  const btnCancelar = document.getElementById("btn-cancelar");
+  const msgSalvar = document.getElementById("mensagem-salvar");
+
+  if (btnEntrar) {
+    btnEntrar.addEventListener("click", async function () {
+      const pinDigitado = inputPin.value.trim();
+      if (!pinDigitado) {
+        msgLogin.textContent = "Digite o PIN para continuar.";
+        msgLogin.className = "mensagem-status erro";
+        return;
+      }
+
+      msgLogin.textContent = "Conectando...";
+      msgLogin.className = "mensagem-status";
+
+      try {
+        const resposta = await fetch(`${CONFIG_ALUNO.apiUrl}/api/v1/boletins/abrir`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            turma: CONFIG_ALUNO.turma,
+            numero_chamada: CONFIG_ALUNO.numeroChamada,
+            pin: pinDigitado
+          })
+        });
+
+        if (resposta.status === 401) {
+          msgLogin.textContent = "Turma, chamada ou PIN inválidos.";
+          msgLogin.className = "mensagem-status erro";
+          return;
+        }
+
+        if (resposta.status === 429) {
+          msgLogin.textContent = "Muitas tentativas. Aguarde um minuto e tente novamente.";
+          msgLogin.className = "mensagem-status erro";
+          return;
+        }
+
+        if (!resposta.ok) {
+          msgLogin.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
+          msgLogin.className = "mensagem-status erro";
+          return;
+        }
+
+        const resultado = await resposta.json();
+        pinSessao = pinDigitado;
+        inputPin.value = "";
+
+        if (resultado.dados !== null) {
+          boletimAtual = processarDadosAPI(resultado.dados);
+        } else {
+          boletimAtual = carregarDadosLocais();
+        }
+
+        areaLogin.style.display = "none";
+        areaBoletim.style.display = "block";
+        renderizarBoletim();
+
+      } catch (err) {
+        msgLogin.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
+        msgLogin.className = "mensagem-status erro";
+      }
+    });
+  }
+
+  if (btnAlterarDados) {
+    btnAlterarDados.addEventListener("click", function () {
+      renderizarTabelaEdicao();
+      msgSalvar.textContent = "";
+      areaEdicao.style.display = "block";
+    });
+  }
+
+  if (btnCancelar) {
+    btnCancelar.addEventListener("click", function () {
+      areaEdicao.style.display = "none";
+      msgSalvar.textContent = "";
+    });
+  }
+
+  if (btnSalvar) {
+    btnSalvar.addEventListener("click", async function () {
+      let houverErro = false;
+      const novosDados = [];
+
+      document.querySelectorAll(".campo-invalido").forEach(function (el) {
+        el.classList.remove("campo-invalido");
+      });
+
+      boletimAtual.forEach(function (item, idx) {
+        const inpN1 = document.getElementById(`edit-n1-${idx}`);
+        const inpF1 = document.getElementById(`edit-f1-${idx}`);
+        const inpN2 = document.getElementById(`edit-n2-${idx}`);
+        const inpF2 = document.getElementById(`edit-f2-${idx}`);
+        const inpN3 = document.getElementById(`edit-n3-${idx}`);
+        const inpF3 = document.getElementById(`edit-f3-${idx}`);
+
+        const valN1 = validarNotaDigitada(inpN1.value);
+        if (valN1 === false) { inpN1.classList.add("campo-invalido"); houverErro = true; }
+
+        const valF1 = validarFaltaDigitada(inpF1.value);
+        if (valF1 === false) { inpF1.classList.add("campo-invalido"); houverErro = true; }
+
+        const valN2 = validarNotaDigitada(inpN2.value);
+        if (valN2 === false) { inpN2.classList.add("campo-invalido"); houverErro = true; }
+
+        const valF2 = validarFaltaDigitada(inpF2.value);
+        if (valF2 === false) { inpF2.classList.add("campo-invalido"); houverErro = true; }
+
+        const valN3 = validarNotaDigitada(inpN3.value);
+        if (valN3 === false) { inpN3.classList.add("campo-invalido"); houverErro = true; }
+
+        const valF3 = validarFaltaDigitada(inpF3.value);
+        if (valF3 === false) { inpF3.classList.add("campo-invalido"); houverErro = true; }
+
+        novosDados.push({
+          disciplina: item.disciplina,
+          tri1: valN1 === false ? null : valN1,
+          tri2: valN2 === false ? null : valN2,
+          tri3: valN3 === false ? null : valN3,
+          faltas1: valF1 === false ? 0 : valF1,
+          faltas2: valF2 === false ? 0 : valF2,
+          faltas3: valF3 === false ? 0 : valF3
+        });
+      });
+
+      if (houverErro) {
+        msgSalvar.textContent = "Existem campos com valores inválidos. Corrija-os para salvar.";
+        msgSalvar.className = "mensagem-status erro";
+        return;
+      }
+
+      msgSalvar.textContent = "Salvando...";
+      msgSalvar.className = "mensagem-status";
+
+      try {
+        const resposta = await fetch(`${CONFIG_ALUNO.apiUrl}/api/v1/boletins/salvar`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            turma: CONFIG_ALUNO.turma,
+            numero_chamada: CONFIG_ALUNO.numeroChamada,
+            pin: pinSessao,
+            dados: {
+              disciplinas: novosDados
+            }
+          })
+        });
+
+        if (!resposta.ok) {
+          msgSalvar.textContent = "Não foi possível salvar as alterações. Tente novamente.";
+          msgSalvar.className = "mensagem-status erro";
+          return;
+        }
+
+        boletimAtual = novosDados;
+        renderizarBoletim();
+        msgSalvar.textContent = "Dados salvos com sucesso.";
+        msgSalvar.className = "mensagem-status sucesso";
+
+        setTimeout(function () {
+          areaEdicao.style.display = "none";
+          msgSalvar.textContent = "";
+        }, 1500);
+
+      } catch (err) {
+        msgSalvar.textContent = "Não foi possível salvar as alterações. Tente novamente.";
+        msgSalvar.className = "mensagem-status erro";
+      }
+    });
+  }
+});
